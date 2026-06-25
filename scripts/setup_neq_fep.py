@@ -2,7 +2,7 @@ import BioSimSpace as bss
 import os
 import sys 
 
-project_dir = "/group/chem/oliveira2t/af25016/kpc2-neq-fep-dnemd/"
+project_dir = ""
 # ligand_1_name = sys.argv[1]
 # ligand_2_name = sys.argv[2]
 # repeat = sys.argv[3]
