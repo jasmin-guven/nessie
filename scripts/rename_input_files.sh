@@ -1,18 +1,18 @@
-#!/bin/zsh
+#!/bin/bash
 
-PROJECT_DIR="/Users/af25016/projects/kpc2-neq-fep-dnemd/"
-transformation=$1
-repeat=$2
+PROJECT_DIR=$1
+transformation=$2
+repeat=$3
 
 lambda_array=(0.0000 1.0000)
 
-transformation_dir=${PROJECT_DIR}/outputs/repeat_${repeat}/${transformation}
+transformation_dir=${PROJECT_DIR}/outputs/${repeat}/${transformation}
 
-for stage in "bound" "unbound"
+for stage in "bound"
 do
 	stage_dir=${transformation_dir}/${stage}/
 	cd $stage_dir
-	for lambda in ${lambda_array[@]}
+	for $lambda in ${lambda_array[@]}
 	do
 		echo "min"
 		cd ${stage_dir}/min/lambda_${lambda}/

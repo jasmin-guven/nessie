@@ -3,13 +3,24 @@ import glob
 import sys
 import shutil
 
+# project_directory = sys.argv[1]
 
-ligand_1_name=sys.argv[1]
-ligand_2_name=sys.argv[2]
-repeat = sys.argv[3]
+# ligand_1=sys.argv[2]
+# ligand_2=sys.argv[3]
+# repeat = sys.argv[4]
 
+# ligand_1_name = f"{ligand_1}"
+# ligand_2_name = f"{ligand_2}"
+
+ligand_1_name = "ligand_1"
+ligand_2_name = "ligand_4"
+
+repeat = 1
 
 project_directory = "/Users/af25016/projects/kpc2-neq-fep-dnemd/"
+
+stage = "bound"
+
 
 transformation_directory = os.path.join(
     project_directory, 
@@ -20,6 +31,7 @@ transformation_directory = os.path.join(
 
 steps = ["min", "nvt", "npt", ""]
 stages = ["unbound", "bound"]
+stages = ["bound"]
 
 for step in steps:
     for stage in stages:
@@ -43,7 +55,7 @@ for step in steps:
                 print(f"Removed directory: {dir}") 
                 continue
             print(dir)
-            mdp_file = os.path.join(dir, "gromacs.mdp")
+            mdp_file = os.path.join(dir, "gromacs.m dp")
             mdp = {}
             with open(mdp_file, "r") as ifile:
                 for line in ifile:
@@ -95,9 +107,6 @@ for step in steps:
                 del mdp["init-lambda-state"]
             if "fep-lambdas" in mdp.keys():
                 del mdp["fep-lambdas"]
-
-            if "calc-lambda-neighbors" in mdp.keys():
-                del mdp["calc-lambda-neighbors"]
 
             if "lambda_0.0000" in dir:
                 mdp["init-lambda"] = 0
