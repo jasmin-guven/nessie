@@ -1,1 +1,1 @@
-# pyNES: python non-equilibrium switching - "nessie" 
+# pyNES: python non-equilibrium switching - nessie
