@@ -62,6 +62,8 @@ pynes/
 
 ### `config.py`
 
+Pure data — both are dataclasses with sensible defaults so they can be constructed from YAML/TOML.
+
 ```python
 from dataclasses import dataclass, field
 
@@ -93,14 +95,20 @@ class SlurmConfig:
 ### `preparation/ligand.py` — `Ligand`
 
 Wraps scripts `01`, `02`, `04` and the `fix_topology_line.py` logic.
+`base_dir` is resolved to `base_dir / name` in `__post_init__` so the caller passes the parent directory.
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class Ligand:
     """A small molecule with associated file paths and parameterisation state."""
+    name: str
+    base_dir: Path
 
-    def __init__(self, name: str, base_dir: Path):
-        self.name = name
-        self.base_dir = base_dir / name
+    def __post_init__(self):
+        self.base_dir = self.base_dir / self.name
 
     # --- derived paths ---
     @property
@@ -137,12 +145,14 @@ class Ligand:
 Simple data holder for the pre-prepared protein input.
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class Protein:
     """Pre-prepared protein structure + GROMACS topology."""
-
-    def __init__(self, project_dir: Path, name: str = "protein"):
-        self.project_dir = project_dir
-        self.name = name
+    project_dir: Path
+    name: str = "protein"
 
     @property
     def gro_file(self) -> Path: ...
@@ -159,12 +169,14 @@ class Protein:
 Wraps scripts `03`, `05`, `06`, `07` and the logic in `edit_gro_complex.py`.
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class ProteinLigandComplex:
     """Protein + ligand system ready for MD."""
-
-    def __init__(self, protein: Protein, ligand: Ligand):
-        self.protein = protein
-        self.ligand = ligand
+    protein: Protein
+    ligand: Ligand
 
     @property
     def output_dir(self) -> Path: ...
@@ -180,10 +192,10 @@ class ProteinLigandComplex:
     def create_topology(self) -> None:
         """Insert ligand #include into protein topology. Corresponds to script 03."""
 
-    def solvate(self, gmx: GromacsRunner, box_type: str = "cubic", d: float = 1.0) -> None:
+    def solvate(self, gmx: "GromacsRunner", box_type: str = "cubic", d: float = 1.0) -> None:
         """editconf + solvate. Corresponds to script 06."""
 
-    def add_ions(self, gmx: GromacsRunner, ions_mdp: Path, config: SimulationConfig) -> None:
+    def add_ions(self, gmx: "GromacsRunner", ions_mdp: Path, config: SimulationConfig) -> None:
         """grompp + genion. Corresponds to script 07."""
 ```
 
@@ -192,13 +204,16 @@ class ProteinLigandComplex:
 ### `simulation/mdp.py` — `MdpFile`
 
 Encapsulates reading, editing, and writing `.mdp` files. Replaces the procedural logic in `fix_mdp.py`.
+`params` defaults to an empty dict; use `from_file` to load an existing file.
 
 ```python
+from dataclasses import dataclass, field
+from pathlib import Path
+
+@dataclass
 class MdpFile:
     """GROMACS MDP parameter file."""
-
-    def __init__(self, params: dict[str, str]):
-        self.params = params
+    params: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def from_file(cls, path: Path) -> "MdpFile":
@@ -221,12 +236,14 @@ class MdpFile:
 Thin, testable wrapper around `gmx_mpi` CLI calls. Replaces the scattered `subprocess.Popen` and `os.system('gmx ...')` calls throughout the scripts.
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class GromacsRunner:
     """Runs GROMACS commands via subprocess."""
-
-    def __init__(self, gmx_executable: str = "gmx_mpi", maxwarn: int = 2):
-        self.gmx = gmx_executable
-        self.maxwarn = maxwarn
+    gmx_executable: str = "gmx_mpi"
+    maxwarn: int = 2
 
     def editconf(self, input_gro: Path, output_gro: Path,
                  box_type: str = "cubic", d: float = 1.0) -> None: ...
@@ -252,11 +269,13 @@ class GromacsRunner:
 Reads `fep_network.csv` and provides access to `Transformation` objects.
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class FEPNetwork:
     """The set of ligand-pair transformations defined in fep_network.csv."""
-
-    def __init__(self, transformations: list["Transformation"]):
-        self.transformations = transformations
+    transformations: list["Transformation"]
 
     @classmethod
     def from_csv(cls, path: Path) -> "FEPNetwork": ...
@@ -272,18 +291,19 @@ class FEPNetwork:
 ### `fep/transformation.py` — `Transformation`
 
 Represents a single edge in the perturbation network.
+`name` is derived from its two ligands so it is a property rather than a stored field.
 
 ```python
+from dataclasses import dataclass
+
+@dataclass
 class Transformation:
     """One ligand-pair perturbation edge."""
-
-    def __init__(self, ligand_a: Ligand, ligand_b: Ligand,
-                 score: float, n_windows: int, lambdas: list[float]):
-        self.ligand_a = ligand_a
-        self.ligand_b = ligand_b
-        self.score = score
-        self.n_windows = n_windows
-        self.lambdas = lambdas
+    ligand_a: Ligand
+    ligand_b: Ligand
+    score: float
+    n_windows: int
+    lambdas: list[float]
 
     @property
     def name(self) -> str:
@@ -297,17 +317,17 @@ class Transformation:
 Wraps BioSimSpace calls from `setup_neq_fep.py` and the MDP patching from `fix_mdp.py`. One instance per (transformation × repeat × stage).
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class NEQFEPSetup:
     """Sets up one NEQ FEP leg using BioSimSpace."""
-
-    def __init__(self, transformation: Transformation,
-                 repeat: int, stage: str,
-                 project_dir: Path, config: SimulationConfig):
-        self.transformation = transformation
-        self.repeat = repeat
-        self.stage = stage           # "bound" or "unbound"
-        self.project_dir = project_dir
-        self.config = config
+    transformation: Transformation
+    repeat: int
+    stage: str           # "bound" or "unbound"
+    project_dir: Path
+    config: SimulationConfig
 
     @property
     def output_dir(self) -> Path: ...
@@ -317,6 +337,7 @@ class NEQFEPSetup:
 
     def create_mapping(self): ...         # bss.Align.matchAtoms
     def align_and_merge(self): ...        # bss.Align.rmsdAlign + merge
+
     def setup_protocols(self) -> None:
         """Create min / nvt / npt / production BioSimSpace protocols and write
         GROMACS input for each lambda window."""
@@ -340,14 +361,15 @@ class NEQFEPSetup:
 Manages the directory structure and file staging for equilibration (scripts `08`, `09`).
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class EquilibrationSetup:
     """Creates per-ligand, per-repeat equilibration directories."""
-
-    def __init__(self, project_dir: Path, config: SimulationConfig,
-                 scripts_dir: Path):
-        self.project_dir = project_dir
-        self.config = config
-        self.scripts_dir = scripts_dir
+    project_dir: Path
+    config: SimulationConfig
+    scripts_dir: Path
 
     @property
     def equil_dir(self) -> Path: ...
@@ -355,8 +377,7 @@ class EquilibrationSetup:
     def setup_directories(self, ligands: list[Ligand]) -> None:
         """Create dirs and copy mdp/topology/posre/gro files. Script 08."""
 
-    def submit(self, slurm: "SlurmSubmitter",
-               n_ligands: int) -> list[str]:
+    def submit(self, slurm: "SlurmSubmitter", n_ligands: int) -> list[str]:
         """Submit SLURM array jobs for all repeats. Script 09.
         Returns list of submitted job IDs."""
 ```
@@ -368,12 +389,14 @@ class EquilibrationSetup:
 Generates and submits SLURM job scripts, replacing the hardcoded `sbatch` calls.
 
 ```python
+from dataclasses import dataclass
+from pathlib import Path
+
+@dataclass
 class SlurmSubmitter:
     """Creates and submits SLURM job scripts."""
-
-    def __init__(self, config: SlurmConfig, scripts_dir: Path):
-        self.config = config
-        self.scripts_dir = scripts_dir
+    config: SlurmConfig
+    scripts_dir: Path
 
     def submit_equilibration(self, equil_dir: Path,
                              n_repeats: int, array_range: str) -> list[str]:
@@ -392,21 +415,25 @@ class SlurmSubmitter:
 ### `pipeline.py` — `Pipeline`
 
 Top-level orchestrator. Mirrors the numbered script sequence and gives users a single entry point.
+`gmx` and `slurm` are derived from the other fields in `__post_init__`.
 
 ```python
+from dataclasses import dataclass, field
+from pathlib import Path
+
+@dataclass
 class Pipeline:
     """Orchestrates the full pyNES NEQ FEP workflow."""
+    project_dir: Path
+    network: FEPNetwork
+    sim_config: SimulationConfig
+    slurm_config: SlurmConfig
+    gmx: GromacsRunner = field(init=False)
+    slurm: SlurmSubmitter = field(init=False)
 
-    def __init__(self, project_dir: Path,
-                 network: FEPNetwork,
-                 sim_config: SimulationConfig,
-                 slurm_config: SlurmConfig):
-        self.project_dir = project_dir
-        self.network = network
-        self.sim_config = sim_config
-        self.slurm_config = slurm_config
+    def __post_init__(self):
         self.gmx = GromacsRunner()
-        self.slurm = SlurmSubmitter(slurm_config, project_dir / "scripts")
+        self.slurm = SlurmSubmitter(self.slurm_config, self.project_dir / "scripts")
 
     # --- step methods (can be called individually or via run_all) ---
 
@@ -462,9 +489,12 @@ Protein ──────────►│                    │
 
 ## Design Notes
 
+- **Dataclasses are used for all classes** whose primary role is holding structured data (`Ligand`, `Protein`, `Transformation`, `MdpFile`, `GromacsRunner`, `FEPNetwork`, `NEQFEPSetup`, `EquilibrationSetup`, `SlurmSubmitter`, `Pipeline`). They give free `__repr__`, `__eq__`, and a consistent constructor signature, and make it straightforward to load configs from YAML/TOML via `dacite` or `cattrs`.
+- **`__post_init__` for derived state**: `Ligand` resolves its working directory, and `Pipeline` constructs its injected `GromacsRunner` and `SlurmSubmitter` instances, so callers only supply the four declarative fields.
+- **`field(init=False)`** on `Pipeline.gmx` and `Pipeline.slurm` signals that these are not constructor arguments — they are internal implementation details built from the other fields.
+- **`name` stays a `@property`** on `Transformation` rather than a stored field: it is always derivable from `ligand_a` and `ligand_b`, so storing it separately would risk the two going out of sync.
 - **Separation of concerns**: each class owns exactly one concept (file IO, GROMACS calls, BioSimSpace setup). The `Pipeline` composes them — it does not re-implement their logic.
 - **`GromacsRunner` is injectable**: pass it to `ProteinLigandComplex`, `EquilibrationSetup`, etc., so tests can substitute a mock without spawning real GROMACS processes.
 - **`MdpFile` replaces `fix_mdp.py`**: the procedural script has stage-specific conditionals that map cleanly to `update()` calls — one per stage type (`min`, `nvt`, `npt`, production).
 - **`NEQFEPSetup` is per (transformation × repeat × stage)**: keeping it fine-grained makes it easy to parallelise or restart individual legs.
-- **`FEPNetwork` is the single source of truth for edges**: the CSV columns (`score`, `n_windows`, `lambdas`) map directly onto `Transformation` attributes, so downstream code never hard-codes lambda schedules.
-- **`SlurmConfig` and `SimulationConfig` are dataclasses**: they can be loaded from a YAML/TOML config file, making the package reproducible and version-controllable without touching code.
+- **`FEPNetwork` is the single source of truth for edges**: the CSV columns (`score`, `n_windows`, `lambdas`) map directly onto `Transformation` fields, so downstream code never hard-codes lambda schedules.
