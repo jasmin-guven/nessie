@@ -14,7 +14,6 @@ jobs:
           environment-file: dev-environment.yml
           activate-environment: nessie-dev
           use-mamba: true
-          cache-environment: true
 
       - name: Test import
         shell: bash -el {0}
