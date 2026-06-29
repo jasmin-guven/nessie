@@ -1,4 +1,4 @@
-# nessie: python package for non-equilibrium switching
+# nessie: python package for non-equilibrium switching (NES) and dynamical non-equilibrium molecular dynamics (D-NEMD)
 
 # Requirements
 
@@ -14,7 +14,7 @@ curl https://raw.githubusercontent.com/jasmin-guven/nessie/refs/heads/feat/env-a
 
 Create and activate the environment:
 ```
-mamba create -f dev-environment.yml
+mamba env create -f dev-environment.yml
 mamba activate nessie-dev
 ```
 
