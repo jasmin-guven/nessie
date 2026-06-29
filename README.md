@@ -9,7 +9,7 @@
 
 Download the `dev-environment.yml` file:
 ```
-curl https://raw.githubusercontent.com/jasmin-guven/nessie/refs/heads/feat/env-and-installation/dev-environment.yml
+curl --output dev-environment.yml https://raw.githubusercontent.com/jasmin-guven/nessie/refs/heads/main/dev-environment.yml
 ```
 
 Create and activate the environment:
