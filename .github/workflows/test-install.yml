@@ -14,6 +14,10 @@ jobs:
           environment-file: dev-environment.yml
           activate-environment: nessie-dev
           use-mamba: true
+      
+      - name: Install package
+        shell: bash -el {0}
+        run: pip install -e .
 
       - name: Test import
         shell: bash -el {0}
