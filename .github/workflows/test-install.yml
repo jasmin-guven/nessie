@@ -1,0 +1,21 @@
+name: Test Installation
+
+on: [push, pull_request]
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: dev-environment.yml
+          activate-environment: nessie-dev
+          use-mamba: true
+          cache-environment: true
+
+      - name: Test import
+        shell: bash -el {0}
+        run: python -c "import nessie"
