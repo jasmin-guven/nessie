@@ -18,11 +18,15 @@ jobs:
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
           echo $CONDA/bin >> $GITHUB_PATH
-      - name: Install package
-        run: pip install -e .
-      - name: Install packages
+      
+      - name: Install local package
         run: |
-          conda env update --file dev-environment.yml --name base
+          python -m pip install --upgrade pip setuptools wheel
+          # Editable install so local changes are visible in the runner
+          pip install -e .
+          # If you need development extras, use:
+          # pip install -e ".[dev]"
+
       - name: Lint with flake8
         run: |
           conda install flake8
@@ -31,4 +35,4 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test import
-        run: python -c "import nessie"
+        run: python -c "import nessie; print('import ok:', getattr(nessie, '__file__', 'package without __file__'))"
