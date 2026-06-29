@@ -21,6 +21,7 @@ log = logging.getLogger("rich")
 class Ligand:
     name: str
     filepath: str
+    directory: Optional[str] = field(default=None, init=False)
     resname: Optional[str] = field(default=None, init=False)
     fileformat: Optional[str] = field(default=None, init=False)
 
@@ -32,8 +33,17 @@ class Ligand:
         _, file_extension = os.path.splitext(self.filepath)
         self.fileformat = file_extension.strip(".").lower()
         
+        if not self.directory:
+            log.info(f"Directory not set. Implying from input file: {self.filepath}")
+            self.directory = os.path.dirname(self.filepath)
+            log.info(f"Directory set to: {self.directory}")
+
         allowed_formats = ["sdf", "pdb"]
         if self.fileformat not in allowed_formats:
             raise NotImplementedError(f"Fileformat {self.fileformat} not supported.\nMust be one of {allowed_formats}.")
         
         log.info(f"fileformat set to {self.fileformat}")
+
+    def parameterise(self):
+
+        if self.fileformat != "pdb":
