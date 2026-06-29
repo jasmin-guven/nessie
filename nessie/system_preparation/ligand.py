@@ -48,7 +48,7 @@ class Ligand:
         log.info(f"fileformat set to {self.fileformat}")
 
     def _run_obabel(self):
-        pdb_file = os.path.join(self.directory, self.name, ".pdb")
+        pdb_file = os.path.join(self.directory, f"{self.name}.pdb")
         obabel_command = f"obabel -i {self.fileformat} {self.filepath} -o pdb -O {pdb_file}"
         log.info(f"Converting input file from format {self.fileformat} to pdb:\n{obabel_command}")
         os.system(obabel_command)
