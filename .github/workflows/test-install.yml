@@ -18,7 +18,7 @@ jobs:
       - name: Install local package
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -e .
+          pip install .
           pip show nessie
 
       - name: Lint with flake8
