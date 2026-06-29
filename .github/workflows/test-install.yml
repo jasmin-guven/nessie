@@ -17,7 +17,7 @@ jobs:
       
       - name: Install package
         shell: bash -el {0}
-        run: pip install -e .
+        run: pip install .
 
       - name: Test import
         shell: bash -el {0}
