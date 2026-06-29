@@ -4,6 +4,7 @@ import os
 import logging
 from rich.logging import RichHandler
 from rich.console import Console
+import glob 
 
 console = Console(force_terminal=True, color_system="truecolor")
 
@@ -21,6 +22,8 @@ log = logging.getLogger("rich")
 class Ligand:
     name: str
     filepath: str
+    net_charge: int = 0
+    ligand_force_field: str = "gaff2"
     directory: Optional[str] = field(default=None, init=False)
     resname: Optional[str] = field(default=None, init=False)
     fileformat: Optional[str] = field(default=None, init=False)
@@ -44,6 +47,27 @@ class Ligand:
         
         log.info(f"fileformat set to {self.fileformat}")
 
+    def _run_obabel(self):
+        pdb_file = os.path.join(self.directory, self.name, ".pdb")
+        obabel_command = f"obabel -i {self.fileformat} {self.filepath} -o pdb -O {pdb_file}"
+        log.info(f"Converting input file from format {self.fileformat} to pdb:\n{obabel_command}")
+        os.system(obabel_command)
+        if not os.path.isfile(pdb_file):
+            raise RuntimeError(f"File {pdb_file} not found, openbabel command likely failed.")
+        log.info(f"Converted file to pdb format.")
+        self.filepath = pdb_file
+        
+
     def parameterise(self):
 
         if self.fileformat != "pdb":
+            self._run_obabel()
+        
+        acpype_basename = os.path.join(self.directory, self.name)
+        acpype_command = f"acpype -i {self.filepath} -n {self.net_charge} -a {self.ligand_force_field} -b {acpype_basename}"
+        log.info(f"Running acpype with command:\n{acpype_command}")
+        os.system(acpype_command)
+        if not os.path.isdir(acpype_basename):
+            raise RuntimeError(f"Could not find acpype output directory: {acpype_basename}.\nThe acpype command likely failed.")
+        
+        
