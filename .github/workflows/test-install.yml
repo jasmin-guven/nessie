@@ -16,9 +16,7 @@ jobs:
           use-mamba: true
       
       - name: Install package
-        shell: bash -el {0}
-        run: pip install .
+        run: mamba run -n nessie-dev pip install .
 
       - name: Test import
-        shell: bash -el {0}
-        run: python -c "import nessie"
+        run: mamba run -n nessie-dev python -c "import nessie" 
