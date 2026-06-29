@@ -1,0 +1,15 @@
+name: nessie-dev
+channels:
+  - conda-forge
+  - openbiosim
+dependencies:
+  - python>=3.11
+  - biosimspace
+  - numpy<2
+  - mdanalysis
+  - openbabel
+  - pygraphviz
+  - rich
+  - pip
+  - pip:
+    - -e .
