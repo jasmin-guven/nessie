@@ -13,10 +13,10 @@ jobs:
         with:
           environment-file: dev-environment.yml
           activate-environment: nessie-dev
-          use-mamba: true
+          use-conda: true
       
       - name: Install package
-        run: mamba run -n nessie-dev pip install .
+        run: conda run -n nessie-dev pip install .
 
       - name: Test import
-        run: mamba run -n nessie-dev python -c "import nessie" 
+        run: conda run -n nessie-dev python -c "import nessie" 
