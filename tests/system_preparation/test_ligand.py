@@ -51,13 +51,13 @@ def test_openbabel_failure_raise(tmp_path):
         with pytest.raises(RuntimeError):
             ligand._run_obabel()
 
-def test_parameterise_command(tmp_path):
+def test_parameterise_command():
     ligand = Ligand(
         name="ligand_1",
-        filepath=str(DATA / "ligand_1.sdf"),
+        filepath=str(DATA / "ligand_1.pdb"),
         net_charge=-1,
     )
-    with patch("os.system") as mock_sys:
+    with patch("os.system") as mock_sys, patch("os.path.isdir", return_value=True):
         ligand.parameterise()
     cmd = mock_sys.call_args[0][0]
     assert "-n -1" in cmd
