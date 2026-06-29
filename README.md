@@ -1,5 +1,25 @@
-# pyNES: python non-equilibrium switching - nessie
+# nessie: python package for non-equilibrium switching (NES) and dynamical non-equilibrium molecular dynamics (D-NEMD)
 
+# Requirements
+
+1. nessie needs [Gromacs](https://www.gromacs.org) to be able to run non-equilibrium switching simulations
+2. You will need either [mamba](https://mamba.readthedocs.io/en/latest/) (**recommended**) or [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) installed to install nessie.
+
+# Installation instructions for developers
+
+Download the `dev-environment.yml` file:
+```
+curl https://raw.githubusercontent.com/jasmin-guven/nessie/refs/heads/feat/env-and-installation/dev-environment.yml
+```
+
+Create and activate the environment:
+```
+mamba env create -f dev-environment.yml
+mamba activate nessie-dev
+```
+
+
+# Notes:
 ## Setup 
 
 1) Ligand mutation:
