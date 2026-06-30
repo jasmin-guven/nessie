@@ -17,6 +17,19 @@ class Protein:
 
         if not isinstance(self.filepath, list):
             self.filepath = [self.filepath]
+        else:
+            if len(self.filepath) > 2:
+                raise RuntimeError(f"The number of input files should be 1 (single pdb) or 2 (pdb/gro, top).\nGot {len(self.filepath)}.")
+            extensions = [os.path.splitext(file)[1].lower() for file in self.filepath]
+            structure_extensions = {".pdb", ".gro"}
+            topology_extensions = {".top"}
+            has_structure_file = any(ext in structure_extensions for ext in extensions)
+            has_topology_file = any(ext in topology_extensions for ext in extensions)
+            if not (has_structure_file and has_topology_file):
+                raise RuntimeError(
+                    f"When providing 2 files, one must be a structure file (.pdb/.gro) "
+                    f"and one a topology file (.top). Got: {extensions}"
+                )
         
         for file in self.filepath:
             if not os.path.isfile(file):
