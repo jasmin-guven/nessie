@@ -83,3 +83,7 @@ def test_pdb2gmx_failure_raise():
         with pytest.raises(RuntimeError):
             protein.parameterise()
         mock_sys.assert_called_once()
+    cmd = mock_sys.call_args[0][0]
+    assert "-ff amber14sb" in cmd
+    assert "-water tip3p" in cmd
+    
