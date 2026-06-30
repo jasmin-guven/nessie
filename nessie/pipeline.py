@@ -26,6 +26,7 @@ class Pipeline:
     project_directory: str
     protein_path: Optional[str] = field(default=None)
     ligand_path: Optional[str] = field(default=None)
+    ligands: Optional[List[Ligand]] = field(default=None)
 
     def __post_init__(self):
         if not os.path.isdir(self.project_directory):
@@ -84,5 +85,6 @@ class Pipeline:
         
         parameterised_ligands = [ligand.parameterise() for ligand in ligands]
 
+        
 
 
