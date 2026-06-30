@@ -11,5 +11,6 @@ dependencies:
   - pygraphviz
   - rich
   - pip
+  - acpype
   - pip:
     - -e .

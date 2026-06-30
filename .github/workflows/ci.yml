@@ -1,21 +1,21 @@
-name: Test Installation
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
-  build-linux:
+  install:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 5
-
     steps:
       - uses: actions/checkout@v4
-      - name: Set up python 3.11
-        uses: actions/setup-python@v3
+
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install local package
+      - name: Install package
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install .
@@ -29,3 +29,18 @@ jobs:
 
       - name: Test import
         run: python -c "import nessie; print('import ok:', getattr(nessie, '__file__', 'package without __file__'))"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run tests
+        run: pytest tests/ -v
