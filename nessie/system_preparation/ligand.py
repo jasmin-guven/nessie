@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Literal
 import os
 import logging
 from rich.logging import RichHandler
@@ -23,7 +23,7 @@ class Ligand:
     name: str
     filepath: str
     net_charge: int = 0
-    ligand_force_field: str = "gaff2"
+    atom_type: Literal["gaff", "gaff2", "amber", "amber2"] = "gaff2"
     directory: Optional[str] = field(default=None, init=False)
     resname: Optional[str] = field(default=None, init=False)
     fileformat: Optional[str] = field(default=None, init=False)
@@ -64,7 +64,7 @@ class Ligand:
             self._run_obabel()
         
         acpype_basename = os.path.join(self.directory, self.name)
-        acpype_command = f"acpype -i {self.filepath} -n {self.net_charge} -a {self.ligand_force_field} -b {acpype_basename}"
+        acpype_command = f"acpype -i {self.filepath} -n {self.net_charge} -a {self.atom_type} -b {acpype_basename}"
         log.info(f"Running acpype with command:\n{acpype_command}")
         os.system(acpype_command)
         if not os.path.isdir(acpype_basename):
