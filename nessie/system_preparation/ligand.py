@@ -70,10 +70,12 @@ class Ligand:
 
         log.info(f"Running acpype with command:\n{acpype_command}")
         os.system(acpype_command)
-        
+
         acpype_directory = sorted(glob.glob(f"{self.directory}/{self.name}.acpype"))[0]
 
         if not os.path.isdir(acpype_directory):
             raise RuntimeError(f"Could not find acpype output directory: {acpype_directory}.\nThe acpype command likely failed.")
         
         os.chdir(working_directory)
+
+        
