@@ -5,7 +5,7 @@ from nessie.system_preparation.ligand import Ligand
 
 DATA = Path(__file__).parent.parent / "data" / "ligands"
 
-def test_load_pdb(tmp_path):
+def test_load_pdb():
     ligand = Ligand(
         name="ligand_1",
         filepath=str(DATA / "ligand_1.pdb"),
