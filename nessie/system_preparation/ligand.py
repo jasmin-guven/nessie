@@ -22,11 +22,10 @@ log = logging.getLogger("rich")
 class Ligand:
     name: str
     filepath: str
-    net_charge: int = 0
+    net_charge: Optional[int] = field(default=None)
     atom_type: Literal["gaff", "gaff2", "amber", "amber2"] = "gaff2"
     directory: Optional[str] = field(default=None, init=False)
     resname: Optional[str] = field(default=None, init=False)
-    fileformat: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self):
         if not os.path.isfile(self.filepath):
