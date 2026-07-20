@@ -12,7 +12,7 @@ if __name__ == "__main__":
     )
 
     protein_ligand_pipeline.prepare_ligands(
-        net_charge=-1,
+        net_charge=-1, 
         atom_type="gaff2",
         ligand_file_search_pattern="*.pdb"
     )

@@ -65,7 +65,10 @@ class Ligand:
         working_directory = os.getcwd()
         os.chdir(self.directory)
 
-        acpype_command = f"acpype -i {self.filepath} -n {self.net_charge} -a {self.atom_type} -o gmx"
+        acpype_command = f"acpype -i {self.filepath} -a {self.atom_type} -o gmx "
+        
+        if self.net_charge:
+            acpype_command += f"-n {self.net_charge} "
 
         log.info(f"Running acpype with command:\n{acpype_command}")
         os.system(acpype_command)
