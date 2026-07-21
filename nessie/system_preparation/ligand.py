@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, Literal
 import os
-
+import glob
 from nessie.utils import utils
 
 log = utils._initialise_logger()
@@ -10,11 +10,10 @@ log = utils._initialise_logger()
 class Ligand:
     name: str
     filepath: str
-    net_charge: int = 0
+    net_charge: Optional[int] = field(default=None)
     atom_type: Literal["gaff", "gaff2", "amber", "amber2"] = "gaff2"
     directory: Optional[str] = field(default=None, init=False)
     resname: Optional[str] = field(default=None, init=False)
-    fileformat: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self):
         if not os.path.isfile(self.filepath):
@@ -51,11 +50,22 @@ class Ligand:
         if self.fileformat != "pdb":
             self._run_obabel()
         
-        acpype_basename = os.path.join(self.directory, self.name)
-        acpype_command = f"acpype -i {self.filepath} -n {self.net_charge} -a {self.atom_type} -b {acpype_basename}"
+        working_directory = os.getcwd()
+        os.chdir(self.directory)
+
+        acpype_command = f"acpype -i {self.filepath} -a {self.atom_type} -o gmx "
+        
+        if self.net_charge:
+            acpype_command += f"-n {self.net_charge} "
+
         log.info(f"Running acpype with command:\n{acpype_command}")
         os.system(acpype_command)
-        if not os.path.isdir(acpype_basename):
-            raise RuntimeError(f"Could not find acpype output directory: {acpype_basename}.\nThe acpype command likely failed.")
+
+        acpype_directory = sorted(glob.glob(f"{self.directory}/{self.name}.acpype"))[0]
+
+        if not os.path.isdir(acpype_directory):
+            raise RuntimeError(f"Could not find acpype output directory: {acpype_directory}.\nThe acpype command likely failed.")
         
+        os.chdir(working_directory)
+
         
