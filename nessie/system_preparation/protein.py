@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Literal
 import os
 from nessie.utils import utils
 
