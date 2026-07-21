@@ -8,8 +8,8 @@ log = utils._initialise_logger()
 @dataclass
 class Protein:
     filepath: Union[str, List[str]]
-    force_field: str = "amber14sb"
-    water_model: str = "tip3p"
+    force_field: Literal["amber03", "amber19sb", "amber14sb", "amber94", "amber96", "amber99", "amber99sb-ildn", "amber99sb", "amberGS", "charmm27", "gromos43a1", "gromos43a2", "gromos43a3", "gromos43a5", "gromos43a6", "gromos43a7", "oplsaa"] = "amber14sb"
+    water_model: Literal["tip3p", "tip4p", "opc", "opc3", "spc", "spce", "none", "tip4pew", "tip5p", "tips3p"] = "tip3p"
     group_name: Optional[str] = "nessie_complex"
     directory: Optional[str] = field(default=None, init=False)
 
@@ -51,19 +51,21 @@ class Protein:
         
         output_structure_file = os.path.join(self.directory, f"{self.group_name}.gro")
         topology_file = os.path.join(self.directory, "topol.top")
+        index_file = os.path.join(self.directory, "index.ndx")
         if ignore_hyrdorgens:
             ignh = "-ignh"
         else:
-            ignh = "-noignh"
+            ignh = ""
         pdb2gmx_command = f"{gmx_executable} pdb2gmx -f {self.filepath} \
                                 -o {output_structure_file} \
                                 -p {topology_file} \
+                                -n {index_file} \
                                 -ff {self.force_field} \
                                 -water {self.water_model} {ignh}"
         log.info(f"Running {gmx_executable} pdb2gmx with command:\n{pdb2gmx_command}")
         os.system(pdb2gmx_command)
         if not os.path.isfile(output_structure_file) or not os.path.isfile(topology_file):
-            raise RuntimeError(f"Could not find pdb2gmx output gro or top file.\n The pdb2gmx command likely failed.")
+            raise RuntimeError(f"Could not find pdb2gmx output gro or top file.\n The pdb2gmx command likely failed.d.\n Check if the Protein file contains a Ligand or if there's a mismatch between the hydrogens naming and the force field's database, if so, set ignore_hyrdorgens = True)
 
 
 
