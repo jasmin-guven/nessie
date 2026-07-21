@@ -65,7 +65,7 @@ class Protein:
         log.info(f"Running {gmx_executable} pdb2gmx with command:\n{pdb2gmx_command}")
         os.system(pdb2gmx_command)
         if not os.path.isfile(output_structure_file) or not os.path.isfile(topology_file):
-            raise RuntimeError(f"Could not find pdb2gmx output gro or top file.\n The pdb2gmx command likely failed.d.\n Check if the Protein file contains a Ligand or if there's a mismatch between the hydrogens naming and the force field's database, if so, set ignore_hyrdorgens = True)
+            raise RuntimeError(f"Could not find pdb2gmx output gro or top file.\n The pdb2gmx command likely failed.d.\n Check if the Protein file contains a Ligand or if there's a mismatch between the hydrogens naming and the force field's database, if so, set ignore_hyrdorgens = True")
 
 
 
