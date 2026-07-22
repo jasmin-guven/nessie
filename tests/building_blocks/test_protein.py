@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 from unittest.mock import patch
-from nessie.system_preparation.protein import Protein
+from nessie.building_blocks.protein import Protein
 
 DATA = Path(__file__).parent.parent / "data" / "protein"
 

@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 from unittest.mock import patch
-from nessie.system_preparation.ligand import Ligand
+from nessie.building_blocks.ligand import Ligand
 
 DATA = Path(__file__).parent.parent / "data" / "ligands"
 
