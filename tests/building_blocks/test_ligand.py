@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 from unittest.mock import patch
-from nessie.system_preparation.ligand import Ligand
+from nessie.building_blocks.ligand import Ligand
 
 DATA = Path(__file__).parent.parent / "data" / "ligands"
 
@@ -59,7 +59,7 @@ def test_parameterise_command():
     )
     fake_dir = f"{ligand.directory}/{ligand.name}.acpype"
     with patch("os.system") as mock_sys, patch("os.path.isdir", return_value=True), \
-         patch("nessie.system_preparation.ligand.glob.glob", return_value=[fake_dir]):
+         patch("nessie.building_blocks.ligand.glob.glob", return_value=[fake_dir]):
         ligand.parameterise()
     cmd = mock_sys.call_args[0][0]
     assert "-n -1" in cmd

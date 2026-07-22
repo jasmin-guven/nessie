@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import os
 from typing import Optional, List, Literal
-from nessie.system_preparation.ligand import Ligand
+from nessie.building_blocks.ligand import Ligand
 import glob
 
 import logging
