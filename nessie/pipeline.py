@@ -1,24 +1,12 @@
 from dataclasses import dataclass, field
 import os
-from typing import Optional, List, Literal
+from typing import Optional, List, Literal, Union
 from nessie.building_blocks.ligand import Ligand
+from nessie.building_blocks.protein import Protein
 import glob
+from nessie.utils import utils
 
-import logging
-from rich.logging import RichHandler
-from rich.console import Console
-
-console = Console(force_terminal=True, color_system="truecolor")
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    datefmt="[%X]",
-    handlers=[RichHandler(console=console, rich_tracebacks=True, markup=True)],
-    force=True,
-)
-
-log = logging.getLogger("rich")
+log = utils._initialise_logger()
 
 
 @dataclass
@@ -84,6 +72,33 @@ class Pipeline:
         ) for name, file in zip(names, ligand_files)]
         
         parameterised_ligands = [ligand.parameterise() for ligand in ligands]
+
+    def prepare_protein(
+            self, 
+            protein_structure_file: str,
+            force_field: Literal[
+                "amber03", "amber19sb", "amber14sb", "amber94", "amber96", "amber99", 
+                "amber99sb-ildn", "amber99sb", "amberGS", "charmm27", "gromos43a1", "gromos43a2", 
+                "gromos43a3", "gromos43a5", "gromos43a6", "gromos43a7", "oplsaa"
+            ] = "amber14sb",
+            water_model: Literal[
+                "tip3p", "tip4p", "opc", 
+                "opc3", "spc", "spce", 
+                "none", "tip4pew", "tip5p", "tips3p"
+            ] = "tip3p",
+            names: Optional[List[str]] = None,
+            
+    ):
+
+        protein = Protein(
+            filepath=protein_structure_file,
+            force_field=force_field, 
+            water_model=water_model
+        )
+        
+        parameterised_protein = protein.parameterise()
+
+        return parameterised_protein
 
         
 

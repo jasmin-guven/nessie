@@ -14,3 +14,9 @@ protein_ligand_pipeline.prepare_ligands(
     atom_type="gaff2",
     ligand_file_search_pattern="*.pdb"
 )
+
+protein_ligand_pipeline.prepare_protein(
+    filepath=str(DATA_PATH / "protein" / "kpc2.prepared.pdb"),
+    force_field="amber14sb",
+    water_model="tip3p"
+)

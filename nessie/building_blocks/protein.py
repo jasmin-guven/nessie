@@ -12,18 +12,19 @@ class Protein:
         "amber03", "amber19sb", "amber14sb", "amber94", "amber96", "amber99", 
         "amber99sb-ildn", "amber99sb", "amberGS", "charmm27", "gromos43a1", "gromos43a2", 
         "gromos43a3", "gromos43a5", "gromos43a6", "gromos43a7", "oplsaa"
-        ] = "amber14sb"
+    ] = "amber14sb"
     water_model: Literal[
         "tip3p", "tip4p", "opc", 
         "opc3", "spc", "spce", 
         "none", "tip4pew", "tip5p", "tips3p"
-        ] = "tip3p"
+    ] = "tip3p"
     group_name: Optional[str] = "nessie_complex"
     directory: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self):
 
-        if not isinstance(self.filepath, list):
+        if not isinstance(self.filepath, list):"
+            #TODO check that file extension is in {"pdb", "gro"}
             self.filepath = [self.filepath]
         else:
             if len(self.filepath) > 2:
@@ -77,6 +78,11 @@ class Protein:
                 Check if the Protein file contains a Ligand or if there's a mismatch \
                 between the hydrogens naming and the force field's database, if so, set ignore_hyrdorgens = True"
             )
+            #todo dig out top and gro files
+            # filepath = [top, gro]
+            # update self,filepath=filepath
+
+        return self
 
 
 
