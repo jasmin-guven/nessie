@@ -24,7 +24,14 @@ class Protein:
     def __post_init__(self):
 
         if not isinstance(self.filepath, list):"
-            #TODO check that file extension is in {"pdb", "gro"}
+            single_file_extension = [os.path.splitext(self.filepath)[1].lower()]
+            allowed_extensions = {".pdb", ".gro"}
+            has_correct_extension = any(ex in allowed_extensions for ex in single_file_extension)
+            if not has_correct_extension:
+                raise RuntimeError(
+                    f"When providing a single file it must be a structure file"
+                    f"the allowed extensions are {allowed_extensions}. Got: {single_file_extension}"
+                )
             self.filepath = [self.filepath]
         else:
             if len(self.filepath) > 2:
