@@ -5,6 +5,7 @@ from nessie.utils import utils
 
 log = utils._initialise_logger()
 
+# Protein `container` for storing protein descriptors that are automatically initialised unless init=False
 @dataclass
 class Protein:
     filepath: Union[str, List[str]]
@@ -21,11 +22,17 @@ class Protein:
     group_name: Optional[str] = "nessie_complex"
     directory: Optional[str] = field(default=None, init=False)
 
+    # checks to do after the dataclass has been initialised
     def __post_init__(self):
 
+        # isinstance check if self.filepath is a list, if not (just a string) checks if it's .gro or .pdb. (isinstance(object, type))
         if not isinstance(self.filepath, list):
+            # os.path.splitext takes the path to self.filepath and [1].lower() returns the value after the . in lowercase (including .) 
             single_file_extension = [os.path.splitext(self.filepath)[1].lower()]
+            # set of allowed extensions
             allowed_extensions = {".pdb", ".gro"}
+            # any() = is at least one of this true? all() = all must be true;
+            # go through each item (ex) in single_file_extension and check if it's (ex) in allowed_extensions
             has_correct_extension = any(ex in allowed_extensions for ex in single_file_extension)
             if not has_correct_extension:
                 raise RuntimeError(
@@ -33,6 +40,7 @@ class Protein:
                     f"the allowed extensions are {allowed_extensions}. Got: {single_file_extension}"
                 )
             self.filepath = [self.filepath]
+        # if self.filepath is not a string (a list)
         else:
             if len(self.filepath) > 2:
                 raise RuntimeError(f"The number of input files should be 1 (single pdb) or 2 (pdb/gro, top).\nGot {len(self.filepath)}.")
@@ -48,6 +56,7 @@ class Protein:
                 )
         
         for file in self.filepath:
+            # os.path.isfile check if (file) exists in os.path and gives True/False
             if not os.path.isfile(file):
                 raise FileNotFoundError(f"Protein file not found: {file}")
         
@@ -58,17 +67,17 @@ class Protein:
             self.directory = os.path.dirname(self.filepath[0])
             log.info(f"Directory set to: {self.directory}")
 
-
+    # define method parametrise (function inside a class) that works on self 
     def parameterise(
             self, 
             gmx_executable: str = "gmx",
-            ignore_hyrdorgens: bool = False
+            ignore_hydrogens: bool = False
     ):
         
         output_structure_file = os.path.join(self.directory, f"{self.group_name}.gro")
         topology_file = os.path.join(self.directory, "topol.top")
         
-        if ignore_hyrdorgens:
+        if ignore_hydrogens:
             ignh = "-ignh"
         else:
             ignh = "-noignh"
