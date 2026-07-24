@@ -23,7 +23,7 @@ class Protein:
 
     def __post_init__(self):
 
-        if not isinstance(self.filepath, list):"
+        if not isinstance(self.filepath, list):
             single_file_extension = [os.path.splitext(self.filepath)[1].lower()]
             allowed_extensions = {".pdb", ".gro"}
             has_correct_extension = any(ex in allowed_extensions for ex in single_file_extension)
@@ -85,9 +85,8 @@ class Protein:
                 Check if the Protein file contains a Ligand or if there's a mismatch \
                 between the hydrogens naming and the force field's database, if so, set ignore_hyrdorgens = True"
             )
-            #todo dig out top and gro files
-            # filepath = [top, gro]
-            # update self,filepath=filepath
+
+        self.filepath = [output_structure_file, topology_file]
 
         return self
 
