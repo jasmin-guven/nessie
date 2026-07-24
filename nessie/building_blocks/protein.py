@@ -72,7 +72,7 @@ class Protein:
             ignh = "-ignh"
         else:
             ignh = "-noignh"
-        pdb2gmx_command = f"{gmx_executable} pdb2gmx -f {self.filepath} \
+        pdb2gmx_command = f"{gmx_executable} pdb2gmx -f {self.filepath[0]} \
                                 -o {output_structure_file} \
                                 -p {topology_file} \
                                 -ff {self.force_field} \
