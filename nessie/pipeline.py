@@ -8,7 +8,7 @@ from nessie.utils import utils
 
 log = utils._initialise_logger()
 
-
+# Pipeline requires project_directory (mandatory), protein_path, ligand_path, ligands and initialise everything
 @dataclass
 class Pipeline:
     project_directory: str
@@ -16,10 +16,11 @@ class Pipeline:
     ligand_path: Optional[str] = field(default=None)
     ligands: Optional[List[Ligand]] = field(default=None)
 
+    # if self.project_directory is given, checks if exist
     def __post_init__(self):
         if not os.path.isdir(self.project_directory):
             raise FileNotFoundError(f"'project_directory' does not exist: {self.project_directory}")
-
+        # if self.protein_path is not given, try to build it from project_directory
         if not self.protein_path:
             try_protein_path = os.path.join(self.project_directory, "protein")
             log.info(f"'protein_path' not set. Trying: {try_protein_path}.")        
@@ -73,6 +74,7 @@ class Pipeline:
         
         parameterised_ligands = [ligand.parameterise() for ligand in ligands]
 
+    # define prepare_protein method, that uses Protein.parametrise function 
     def prepare_protein(
             self, 
             protein_structure_file: str,
@@ -85,9 +87,7 @@ class Pipeline:
                 "tip3p", "tip4p", "opc", 
                 "opc3", "spc", "spce", 
                 "none", "tip4pew", "tip5p", "tips3p"
-            ] = "tip3p",
-            names: Optional[List[str]] = None,
-            
+            ] = "tip3p",            
     ):
 
         protein = Protein(
