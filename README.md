@@ -7,7 +7,9 @@
 
 # Installation instructions for developers
 
-clone the repo [nessie](https://github.com/jasmin-guven/nessie.git) in the base environment.
+Clone the [nessie](https://github.com/jasmin-guven/nessie.git) repository in some local directory.
+
+Using HTTPS:
 ```
 git clone https://github.com/jasmin-guven/nessie.git
 ```
