@@ -13,6 +13,10 @@ Using HTTPS:
 ```
 git clone https://github.com/jasmin-guven/nessie.git
 ```
+or using SSH:
+
+git clone git@github.com:jasmin-guven/nessie.git
+
 
 Create and activate the environment:
 ```
