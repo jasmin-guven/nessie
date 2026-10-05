@@ -7,17 +7,22 @@
 
 # Installation instructions for developers
 
-Download the `dev-environment.yml` file:
+Clone the [nessie](https://github.com/jasmin-guven/nessie.git) repository in some local directory.
+
+Using HTTPS:
 ```
-curl --output dev-environment.yml https://raw.githubusercontent.com/jasmin-guven/nessie/refs/heads/main/dev-environment.yml
+git clone https://github.com/jasmin-guven/nessie.git
 ```
+or using SSH:
+
+git clone git@github.com:jasmin-guven/nessie.git
+
 
 Create and activate the environment:
 ```
 mamba env create -f dev-environment.yml
 mamba activate nessie-dev
 ```
-
 
 # Notes:
 ## Setup 
